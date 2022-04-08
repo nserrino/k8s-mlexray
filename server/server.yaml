@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlexray-k8s-app
+  labels:
+    app: mlexray-k8s-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlexray-k8s-app
+  template:
+    metadata:
+      labels:
+        app: mlexray-k8s-app
+    spec:
+      containers:
+      - name: mlexray-k8s-app
+        image: natalieserrino/mlexray-k8s-app:0.0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        - containerPort: 5000
+          name: grpc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlexray-k8s-app
+spec:
+  selector:
+    app: mlexray-k8s-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      name: http

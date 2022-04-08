@@ -1,0 +1,35 @@
+import px
+
+def get_op_stats(start_time: str):
+	df = px.DataFrame(table='log_op_info', start_time=start_time)
+	df.latency_ns = px.DurationNanos(df.latency_ns)
+	df = df.groupby(['name', 'type', 'device', 'inputs', 'outputs']).agg(
+		invocations=('run', px.count),
+		total_time=('latency_ns', px.sum),
+		latency_quantiles=('latency_ns', px.quantiles)
+	)
+	df.total_time = px.DurationNanos(df.total_time)
+	return df
+
+def op_info_for_tensor(df: px.DataFrame, op_name: str, start_time: str):
+	ops = px.DataFrame(table='log_op_info', start_time=start_time)
+	ops = ops[px.contains(ops.name, op_name)]
+	df = df.merge(ops, how='inner', left_on='run', right_on='run', suffixes=['', '_x'])
+	df.bytes = px.Bytes(df.bytes)
+	df.op_name = df.name
+	df.op_type = df.type
+	df.op_latency = px.DurationNanos(df.latency_ns)
+	df.data_type = df.dt
+	return df
+
+def input_tensors(op_name: str, start_time: str):
+	df = px.DataFrame(table='log_input_tensor', start_time=start_time)
+	df = op_info_for_tensor(df, op_name, start_time)
+	df.input_idx = df.idx
+	return df[['time_', 'op_name', 'op_type', 'op_latency', 'input_idx', 'shape', 'data_type', 'bytes', 'num_elements', 'dims']]
+
+def output_tensors(op_name: str, start_time: str):
+	df = px.DataFrame(table='log_output_tensor', start_time=start_time)
+	df = op_info_for_tensor(df, op_name, start_time)
+	df.output_idx = df.idx	
+	return df[['time_', 'op_name', 'op_type', 'op_latency', 'output_idx', 'shape', 'data_type', 'bytes', 'num_elements', 'dims']]

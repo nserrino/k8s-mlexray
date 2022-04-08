@@ -1,0 +1,151 @@
+{
+    "variables": [
+        {
+            "name": "start_time",
+            "type": "PX_STRING",
+            "description": "The relative start time of the window. Current time is assumed to be now",
+            "defaultValue": "-3d"
+        },
+        {
+            "name": "op_name",
+            "type": "PX_STRING",
+            "description": "An optional operation name to filter on",
+            "defaultValue": ""
+        }
+    ],
+    "globalFuncs": [
+        {
+            "outputName": "OpStats",
+            "func": {
+                "name": "get_op_stats",
+                "args": [
+                    {
+                        "name": "start_time",
+                        "variable": "start_time"
+                    }
+                ]
+            }
+        },
+        {
+            "outputName": "InputTensors",
+            "func": {
+                "name": "input_tensors",
+                "args": [
+                    {
+                        "name": "op_name",
+                        "variable": "op_name"
+                    },
+                    {
+                        "name": "start_time",
+                        "variable": "start_time"
+                    }
+                ]
+            }
+        },
+        {
+            "outputName": "OutputTensors",
+            "func": {
+                "name": "output_tensors",
+                "args": [
+                    {
+                        "name": "op_name",
+                        "variable": "op_name"
+                    },
+                    {
+                        "name": "start_time",
+                        "variable": "start_time"
+                    }                    
+                ]
+            }
+        }
+    ],
+    "widgets": [
+        {
+            "name": "Ops (Time)",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "w": 6,
+                "h": 4
+            },
+            "globalFuncOutputName": "OpStats",
+            "displaySpec": {
+                "@type": "types.px.dev/px.vispb.BarChart",
+                "bar": {
+                    "value": "total_time",
+                    "label": "name",
+                    "horizontal": true
+                },
+                "xAxis": {
+                    "label": "Sum of time spent in Op"
+                },
+                "yAxis": {
+                    "label": "Op name"
+                }
+            }
+        },
+        {
+            "name": "Ops (Invocations)",
+            "position": {
+                "x": 6,
+                "y": 0,
+                "w": 6,
+                "h": 4
+            },
+            "globalFuncOutputName": "OpStats",
+            "displaySpec": {
+                "@type": "types.px.dev/px.vispb.BarChart",
+                "bar": {
+                    "value": "invocations",
+                    "label": "name",
+                    "horizontal": true
+                },
+                "xAxis": {
+                    "label": "# of invocations"
+                },
+                "yAxis": {
+                    "label": "Op name"
+                }
+            }
+        },
+        {
+            "name": "Ops (Table)",
+            "position": {
+                "x": 0,
+                "y": 4,
+                "w": 12,
+                "h": 4
+            },
+            "globalFuncOutputName": "OpStats",
+            "displaySpec": {
+                "@type": "types.px.dev/px.vispb.Table"
+            }
+        },
+        {
+            "name": "Op Inputs",
+            "position": {
+                "x": 0,
+                "y": 8,
+                "w": 12,
+                "h": 4
+            },
+            "globalFuncOutputName": "InputTensors",
+            "displaySpec": {
+                "@type": "types.px.dev/px.vispb.Table"
+            }
+        },
+        {
+            "name": "Op Outputs",
+            "position": {
+                "x": 0,
+                "y": 12,
+                "w": 12,
+                "h": 4
+            },
+            "globalFuncOutputName": "OutputTensors",
+            "displaySpec": {
+                "@type": "types.px.dev/px.vispb.Table"
+            }
+        }   
+    ]
+}

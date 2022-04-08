@@ -1,0 +1,5 @@
+uprobe:/home/nserrino/.local/lib/python3.8/site-packages/tensorflow/libtensorflow_framework.so.2:_ZN10tensorflow8OpKernel15LogOutputTensorEliiiPKcS2_i
+{
+    printf("time_:%llu run:%lld idx:%d num:%d dims:%d shape:%s dt:%s bytes:%d\n",
+        nsecs, arg1, arg2, arg3, arg4, str(uptr(arg5)), str(uptr(sarg0)), sarg1);
+}

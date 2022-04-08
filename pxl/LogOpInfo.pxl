@@ -1,0 +1,35 @@
+import pxtrace
+import px
+
+
+# NOTE: Fill in the value for proc ID that matches /usr/bin/python3 /app/server.py. 
+# This process ID can be found in the px/pod script for the mlexray pod in Pixie.
+# You may need to generate some load on the application for the /usr/bin/python3 process to show up.
+program = """
+uprobe:/proc/2532969/root/usr/local/lib/python3.8/dist-packages/tensorflow/libtensorflow_framework.so.2:_ZN10tensorflow8OpKernel9LogOpInfoElPKcS2_S2_ii
+{
+    @start[tid] = nsecs;
+}
+
+uprobe:/proc/2532969/root/usr/local/lib/python3.8/dist-packages/tensorflow/libtensorflow_framework.so.2:_ZN10tensorflow8OpKernel9LogOpInfoElPKcS2_S2_ii
+/@start[tid]/
+{
+    printf(\"time_:%llu latency_ns:%d run:%lld name:%s type:%s device:%s inputs:%d outputs:%d\",
+        nsecs, nsecs - @start[tid], arg1, str(arg2), str(arg3), str(arg4), arg5, sarg0);
+    delete(@start[tid]);
+}
+"""
+
+
+def log_op_info():
+    table_name = 'log_op_info'
+    pxtrace.UpsertTracepoint(table_name,
+                             table_name,
+                             program,
+                             pxtrace.kprobe(),
+                             "5d")
+    df = px.DataFrame(table=table_name, start_time='-10m')
+    return df
+
+
+px.display(log_op_info())
